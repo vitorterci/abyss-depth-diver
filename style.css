@@ -1,0 +1,553 @@
+/* ============================================
+   ABYSS DEPTH DIVER - VANILLA JS
+   Stylesheet
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+    color: #00d9ff;
+    overflow: hidden;
+}
+
+/* Game Container */
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: #0a0e27;
+}
+
+.game-wrapper {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    background: #0a0e27;
+    border: 2px solid #00d9ff;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+    overflow: hidden;
+}
+
+/* Canvas */
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* ============================================
+   HUD (Heads-Up Display)
+   ============================================ */
+
+.hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.hud-panel {
+    background: rgba(10, 14, 39, 0.85);
+    border: 1px solid #00d9ff;
+    border-radius: 4px;
+    padding: 8px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.2);
+}
+
+.hud-label {
+    font-size: 11px;
+    color: #00d9ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+.hud-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid #00d9ff;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.hud-bar-fill {
+    height: 100%;
+    width: 100%;
+    transition: width 0.2s ease;
+    border-radius: 1px;
+}
+
+.oxygen-fill {
+    background: linear-gradient(90deg, #00d9ff, #0099cc);
+    box-shadow: 0 0 5px #00d9ff;
+}
+
+.energy-fill {
+    background: linear-gradient(90deg, #ffff00, #ffcc00);
+    box-shadow: 0 0 5px #ffff00;
+}
+
+.health-fill {
+    background: linear-gradient(90deg, #ff3333, #ff0000);
+    box-shadow: 0 0 5px #ff3333;
+}
+
+.hud-value {
+    font-size: 10px;
+    color: #00d9ff;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* HUD Layout Adjustments */
+.depth-panel {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.score-panel {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.sonar-panel {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+/* ============================================
+   Hint Display
+   ============================================ */
+
+.hint-display {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 14, 39, 0.9);
+    border: 2px solid #00d9ff;
+    border-radius: 4px;
+    padding: 12px 20px;
+    color: #00d9ff;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 200;
+    pointer-events: none;
+    min-width: 300px;
+    opacity: 0;
+    animation: fadeInOut 3s ease-in-out;
+    display: none;
+}
+
+.hint-display.active {
+    display: block;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    90% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+}
+
+/* ============================================
+   Controls Display
+   ============================================ */
+
+.controls-display {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    z-index: 100;
+    pointer-events: none;
+    font-size: 11px;
+}
+
+.controls-item {
+    background: rgba(10, 14, 39, 0.7);
+    border: 1px solid #00d9ff;
+    border-radius: 4px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.control-key {
+    color: #ffff00;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+.control-desc {
+    color: #00d9ff;
+    font-size: 9px;
+}
+
+/* ============================================
+   Menu System
+   ============================================ */
+
+.menu-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 300;
+    backdrop-filter: blur(3px);
+}
+
+.menu-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(10, 14, 39, 0.95);
+    border: 2px solid #00d9ff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 400;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #00d9ff;
+    padding-bottom: 10px;
+}
+
+.menu-header h2 {
+    color: #00d9ff;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.menu-close {
+    background: none;
+    border: none;
+    color: #00d9ff;
+    font-size: 20px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.2s;
+}
+
+.menu-close:hover {
+    color: #ffff00;
+}
+
+.menu-content {
+    color: #00d9ff;
+    font-size: 12px;
+}
+
+/* Mission Items */
+.mission-item {
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid #00d9ff;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    pointer-events: auto;
+}
+
+.mission-title {
+    color: #ffff00;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.mission-desc {
+    color: #00d9ff;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.mission-reward {
+    color: #00ff00;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* Upgrade Items */
+.upgrade-item {
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid #00d9ff;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    pointer-events: auto;
+}
+
+.upgrade-title {
+    color: #ffff00;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.upgrade-desc {
+    color: #00d9ff;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.upgrade-unlock {
+    color: #ff9900;
+    font-size: 10px;
+    margin-bottom: 4px;
+}
+
+.upgrade-status {
+    color: #ff3333;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.upgrade-item.unlocked .upgrade-status {
+    color: #00ff00;
+}
+
+/* ============================================
+   Game Over Screen
+   ============================================ */
+
+.game-over-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    backdrop-filter: blur(5px);
+}
+
+.game-over-content {
+    background: rgba(10, 14, 39, 0.95);
+    border: 3px solid #00d9ff;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 0 50px rgba(0, 217, 255, 0.5);
+}
+
+#gameOverTitle {
+    color: #ff3333;
+    font-size: 32px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#gameOverTitle.victory {
+    color: #00ff00;
+}
+
+#gameOverReason {
+    color: #00d9ff;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.game-over-stats {
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid #00d9ff;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: #00d9ff;
+    font-size: 14px;
+}
+
+.stat:last-child {
+    margin-bottom: 0;
+}
+
+.stat-label {
+    font-weight: bold;
+}
+
+.stat-value {
+    color: #ffff00;
+    font-weight: bold;
+}
+
+.restart-button {
+    background: linear-gradient(135deg, #00d9ff, #0099cc);
+    border: none;
+    color: #000;
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.restart-button:hover {
+    background: linear-gradient(135deg, #00ff00, #00cc00);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+.restart-button:active {
+    transform: scale(0.95);
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+
+.menu-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.menu-panel::-webkit-scrollbar-track {
+    background: rgba(0, 217, 255, 0.1);
+    border-radius: 4px;
+}
+
+.menu-panel::-webkit-scrollbar-thumb {
+    background: #00d9ff;
+    border-radius: 4px;
+}
+
+.menu-panel::-webkit-scrollbar-thumb:hover {
+    background: #ffff00;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+@media (max-width: 900px) {
+    .game-wrapper {
+        width: 90vw;
+        height: 67.5vw;
+        max-width: 800px;
+        max-height: 600px;
+    }
+
+    .hud {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .depth-panel {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .score-panel {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .sonar-panel {
+        grid-column: 1 / -1;
+        grid-row: 3;
+    }
+
+    .controls-display {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .menu-panel {
+        max-width: 90vw;
+        max-height: 80vh;
+        padding: 15px;
+    }
+
+    .menu-header h2 {
+        font-size: 16px;
+    }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        text-shadow: 0 0 5px #00d9ff;
+    }
+    50% {
+        text-shadow: 0 0 15px #00d9ff;
+    }
+}
+
+.hud-panel {
+    animation: pulse 2s infinite;
+}
+
+.menu-header h2 {
+    animation: glow 1.5s infinite;
+}

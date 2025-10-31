@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abyss Depth Diver - Vanilla JS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-wrapper">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            
+            <!-- HUD (Heads-Up Display) -->
+            <div class="hud">
+                <!-- Oxygen Bar -->
+                <div class="hud-panel oxygen-panel">
+                    <div class="hud-label">Oxigênio</div>
+                    <div class="hud-bar">
+                        <div class="hud-bar-fill oxygen-fill" id="oxygenBar"></div>
+                    </div>
+                    <div class="hud-value" id="oxygenValue">100%</div>
+                </div>
+
+                <!-- Energy Bar -->
+                <div class="hud-panel energy-panel">
+                    <div class="hud-label">Energia</div>
+                    <div class="hud-bar">
+                        <div class="hud-bar-fill energy-fill" id="energyBar"></div>
+                    </div>
+                    <div class="hud-value" id="energyValue">100%</div>
+                </div>
+
+                <!-- Health Bar -->
+                <div class="hud-panel health-panel">
+                    <div class="hud-label">Saúde</div>
+                    <div class="hud-bar">
+                        <div class="hud-bar-fill health-fill" id="healthBar"></div>
+                    </div>
+                    <div class="hud-value" id="healthValue">100%</div>
+                </div>
+
+                <!-- Depth Display -->
+                <div class="hud-panel depth-panel">
+                    <div class="hud-label">Profundidade</div>
+                    <div class="hud-value" id="depthValue">0m</div>
+                </div>
+
+                <!-- Score Display -->
+                <div class="hud-panel score-panel">
+                    <div class="hud-label">Pontuação</div>
+                    <div class="hud-value" id="scoreValue">0</div>
+                </div>
+
+                <!-- Sonar Cooldown -->
+                <div class="hud-panel sonar-panel">
+                    <div class="hud-label">Sonar</div>
+                    <div class="hud-value" id="sonarValue">Pronto</div>
+                </div>
+            </div>
+
+            <!-- Hint Display -->
+            <div class="hint-display" id="hintDisplay"></div>
+
+            <!-- Game Over Screen -->
+            <div class="game-over-screen" id="gameOverScreen" style="display: none;">
+                <div class="game-over-content">
+                    <h1 id="gameOverTitle">Game Over</h1>
+                    <p id="gameOverReason">Você foi derrotado!</p>
+                    <div class="game-over-stats">
+                        <div class="stat">
+                            <span class="stat-label">Pontuação Final:</span>
+                            <span class="stat-value" id="finalScore">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Profundidade Máxima:</span>
+                            <span class="stat-value" id="maxDepth">0m</span>
+                        </div>
+                    </div>
+                    <button id="restartButton" class="restart-button">Reiniciar Jogo</button>
+                </div>
+            </div>
+
+            <!-- Controls Display -->
+            <div class="controls-display">
+                <div class="controls-item">
+                    <span class="control-key">A/D</span>
+                    <span class="control-desc">Mover Horizontalmente</span>
+                </div>
+                <div class="controls-item">
+                    <span class="control-key">W/S</span>
+                    <span class="control-desc">Mover Verticalmente</span>
+                </div>
+                <div class="controls-item">
+                    <span class="control-key">ESPAÇO</span>
+                    <span class="control-desc">Ativar Sonar</span>
+                </div>
+                <div class="controls-item">
+                    <span class="control-key">M</span>
+                    <span class="control-desc">Missões</span>
+                </div>
+                <div class="controls-item">
+                    <span class="control-key">U</span>
+                    <span class="control-desc">Upgrades</span>
+                </div>
+                <div class="controls-item">
+                    <span class="control-key">B</span>
+                    <span class="control-desc">Debug</span>
+                </div>
+            </div>
+
+            <!-- Menus -->
+            <div class="menu-overlay" id="menuOverlay" style="display: none;"></div>
+            
+            <div class="menu-panel missions-menu" id="missionsMenu" style="display: none;">
+                <div class="menu-header">
+                    <h2>Missões</h2>
+                    <button class="menu-close" id="closeMissionsMenu">✕</button>
+                </div>
+                <div class="menu-content" id="missionsContent">
+                    <div class="mission-item">
+                        <div class="mission-title">Zona Batial</div>
+                        <div class="mission-desc">Alcance 2000m de profundidade</div>
+                        <div class="mission-reward">+500 pontos, +20 Oxigênio</div>
+                    </div>
+                    <div class="mission-item">
+                        <div class="mission-title">Zona Abissal</div>
+                        <div class="mission-desc">Alcance 4000m de profundidade</div>
+                        <div class="mission-reward">+1000 pontos, +30 Oxigênio</div>
+                    </div>
+                    <div class="mission-item">
+                        <div class="mission-title">Zona Hadal</div>
+                        <div class="mission-desc">Alcance 6000m de profundidade</div>
+                        <div class="mission-reward">+2000 pontos, +40 Oxigênio</div>
+                    </div>
+                    <div class="mission-item">
+                        <div class="mission-title">O Abismo</div>
+                        <div class="mission-desc">Alcance 11000m (Fundo do Abismo)</div>
+                        <div class="mission-reward">+10000 pontos, VITÓRIA!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-panel upgrades-menu" id="upgradesMenu" style="display: none;">
+                <div class="menu-header">
+                    <h2>Upgrades</h2>
+                    <button class="menu-close" id="closeUpgradesMenu">✕</button>
+                </div>
+                <div class="menu-content" id="upgradesContent">
+                    <div class="upgrade-item" id="upgrade-oxygenTank">
+                        <div class="upgrade-title">Tanque de Oxigênio Expandido</div>
+                        <div class="upgrade-desc">+50% de capacidade de oxigênio</div>
+                        <div class="upgrade-unlock">Desbloqueado em 3000m</div>
+                        <div class="upgrade-status">🔒 Bloqueado</div>
+                    </div>
+                    <div class="upgrade-item" id="upgrade-advancedSonar">
+                        <div class="upgrade-title">Sonar Avançado</div>
+                        <div class="upgrade-desc">50% menos consumo de energia</div>
+                        <div class="upgrade-unlock">Desbloqueado em 5000m</div>
+                        <div class="upgrade-status">🔒 Bloqueado</div>
+                    </div>
+                    <div class="upgrade-item" id="upgrade-reinforcedHull">
+                        <div class="upgrade-title">Casco Reforçado</div>
+                        <div class="upgrade-desc">30% menos dano recebido</div>
+                        <div class="upgrade-unlock">Desbloqueado em 7000m</div>
+                        <div class="upgrade-status">🔒 Bloqueado</div>
+                    </div>
+                    <div class="upgrade-item" id="upgrade-turboThrust">
+                        <div class="upgrade-title">Propulsor Turbo</div>
+                        <div class="upgrade-desc">30% mais velocidade</div>
+                        <div class="upgrade-unlock">Desbloqueado em 9000m</div>
+                        <div class="upgrade-status">🔒 Bloqueado</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/GameObject.js"></script>
+    <script src="js/Submarine.js"></script>
+    <script src="js/CollisionDetector.js"></script>
+    <script src="js/Renderer.js"></script>
+    <script src="js/InputHandler.js"></script>
+    <script src="js/Game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
